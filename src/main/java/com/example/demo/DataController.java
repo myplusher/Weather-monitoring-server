@@ -5,6 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -14,9 +21,36 @@ public class DataController {
     @Autowired
     DataService dataService;
 
-    @GetMapping("")
-    public List<Data> list() {
-        return dataService.listAllData();
+    @GetMapping("/")
+    public String list() {
+        String address = "http://192.168.0.102:80";
+        HttpURLConnection con = null;
+        StringBuilder sb = new StringBuilder();
+
+        try {
+            con = (HttpURLConnection) new URL(address).openConnection();
+            con.setRequestMethod("GET");
+            con.connect();
+            if (HttpURLConnection.HTTP_OK == con.getResponseCode()) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
+                String line;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                    sb.append("\n");
+                }
+            } else {
+                System.out.println("failed: " + con.getResponseCode() + " error " + con.getResponseMessage());
+            }
+
+        } catch (IOException e) {
+            System.out.println(e);
+        } finally {
+            if (con != null) {
+                con.disconnect();
+            }
+        }
+        return sb.toString();
     }
 
     @GetMapping("/{id}")
@@ -28,7 +62,7 @@ public class DataController {
             return new ResponseEntity<Data>(HttpStatus.NOT_FOUND);
         }
     }
-    @PostMapping("/")
+    @PostMapping("/f")
     public void add(@RequestBody Data data) {
         //TimeZone.setDefault(TimeZone.getTimeZone("Europe/Moscow"));
         Calendar calendar = Calendar.getInstance();

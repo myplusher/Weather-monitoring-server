@@ -10,16 +10,18 @@ public class Data {
     private double temperature;
     private double humidity;
     private double co2;
+    private double light;
     private Date date_time;
 
     public Data() {
     }
 
-    public Data(int id, double temperature, double humidity, double co2, Date date_time) {
+    public Data(int id, double temperature, double humidity, double co2, double light, Date date_time) {
         this.id = id;
         this.temperature = temperature;
         this.humidity = humidity;
         this.co2 = co2;
+        this.light = light;
         this.date_time = date_time;
     }
     @Id
@@ -54,6 +56,14 @@ public class Data {
 
     public void setCo2(double co2) {
         this.co2 = co2;
+    }
+
+    public double getLight() {
+        return light;
+    }
+
+    public void setLight(double light) {
+        this.light = light;
     }
 
     public Date getDate_time() {
