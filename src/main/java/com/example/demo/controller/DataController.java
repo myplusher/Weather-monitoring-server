@@ -1,5 +1,7 @@
-package com.example.demo;
+package com.example.demo.controller;
 
+import com.example.demo.model.Data;
+import com.example.demo.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -23,7 +23,7 @@ public class DataController {
 
     @GetMapping("/")
     public String list() {
-        String address = "http://192.168.0.102:80";
+        String address = "http://192.168.0.103:80";
         HttpURLConnection con = null;
         StringBuilder sb = new StringBuilder();
 
@@ -45,6 +45,7 @@ public class DataController {
 
         } catch (IOException e) {
             System.out.println(e);
+            return e.toString();
         } finally {
             if (con != null) {
                 con.disconnect();
