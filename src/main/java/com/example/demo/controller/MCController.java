@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+// Контроллер для взаимодействия с микроконтроллерами esp
 @RestController
 @RequestMapping("/")
 public class MCController {
@@ -23,7 +24,7 @@ public class MCController {
     public String addMC(@RequestBody Microcontroller microcontroller) {
         Gson gson = new Gson();
         mcService.save(microcontroller);
-        return gson.toJson("200");
+        return gson.toJson("201");
     }
 
     @PutMapping("/controllers/{id}")

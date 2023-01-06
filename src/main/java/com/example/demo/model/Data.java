@@ -7,6 +7,7 @@ import java.util.Date;
 @Table(name = "data")
 public class Data {
     private int id;
+    private String title;
     private double temperature;
     private double humidity;
     private double co2;
@@ -16,8 +17,9 @@ public class Data {
     public Data() {
     }
 
-    public Data(int id, double temperature, double humidity, double co2, double light, Date date_time) {
+    public Data(int id, String title, double temperature, double humidity, double co2, double light, Date date_time) {
         this.id = id;
+        this.title = title;
         this.temperature = temperature;
         this.humidity = humidity;
         this.co2 = co2;
@@ -32,6 +34,14 @@ public class Data {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public double getTemperature() {

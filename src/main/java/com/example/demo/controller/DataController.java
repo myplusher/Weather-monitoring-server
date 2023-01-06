@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Data;
+import com.example.demo.model.Location;
 import com.example.demo.service.DataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/")
@@ -52,6 +54,39 @@ public class DataController {
             }
         }
         return sb.toString();
+    }
+
+    @GetMapping("/rooms/{id}")
+    public Data getRoomData(@PathVariable int id) {
+        return generateRoomData(id);
+    }
+
+    @GetMapping("/rooms")
+    public List<Data> getRoomList() {
+        List<Data> list = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++)
+            list.add(generateRoomData());
+
+        return list;
+    }
+
+    private Data generateRoomData() {
+        return generateRoomData(0);
+    }
+
+    private Data generateRoomData(int id) {
+        if (id == 0)
+            id = ThreadLocalRandom.current().nextInt(30, 100);
+
+        String title = "Помещение " + id;
+
+        double temp = ThreadLocalRandom.current().nextDouble(0, 50);
+        double h = ThreadLocalRandom.current().nextDouble(30, 100);
+        double co2 = ThreadLocalRandom.current().nextDouble(30, 100);
+        double light = ThreadLocalRandom.current().nextDouble(100, 4000);
+
+        return new Data(id, title, temp, h, co2, light, new Date());
     }
 
     @GetMapping("/{id}")
