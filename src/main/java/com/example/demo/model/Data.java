@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -16,6 +18,7 @@ public class Data {
     private double light;
     private Date date_time;
 
+    @SerializedName("microcontroller")
     @ManyToOne
     @JoinColumn(name = "microcontrollerId", insertable = false, updatable = false)
     private Microcontroller microcontrollerId;
@@ -31,7 +34,8 @@ public class Data {
     public Data() {
     }
 
-    public Data(int id, String title, double temperature, double humidity, double co2, double light, Date date_time) {
+    public Data(int id, String title, double temperature, double humidity, double co2, double light, Date date_time,
+                Microcontroller microcontroller) {
         this.id = id;
         this.title = title;
         this.temperature = temperature;
@@ -39,6 +43,7 @@ public class Data {
         this.co2 = co2;
         this.light = light;
         this.date_time = date_time;
+        this.microcontrollerId = microcontroller;
     }
 
     public int getId() {

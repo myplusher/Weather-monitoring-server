@@ -4,7 +4,9 @@ import com.example.demo.model.Data;
 import com.example.demo.model.Location;
 import com.example.demo.model.Microcontroller;
 import com.example.demo.service.DataService;
+import com.example.demo.service.LocationService;
 import com.example.demo.service.MCService;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,42 +30,64 @@ public class DataController {
     @Autowired
     MCService mcService;
 
+    @Autowired
+    LocationService locationService;
+
+    Gson gson = new Gson();
+
     @GetMapping("/")
-    public String list() {
+    public Data[] list() {
         List<Microcontroller> microcontrollers = mcService.listAll();
-        for (Microcontroller mc: microcontrollers) {
-
+        //StringBuilder sb = new StringBuilder();
+        Data[] data = new Data[microcontrollers.size()];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = new Data();
+            data[i].setMicrocontroller(mcService.get(microcontrollers.get(i).getId()));
         }
-        
-        String address = "http://192.168.0.103:80";
-        HttpURLConnection con = null;
-        StringBuilder sb = new StringBuilder();
+//        if (microcontrollers.size() > 1) {
+//            sb.append("[");
+//        }
+        for (Data d: data) {
+            String address = d.getMicrocontroller().getAddress();
+            address = "http://"+address+":80";
+            HttpURLConnection con = null;
 
-        try {
-            con = (HttpURLConnection) new URL(address).openConnection();
-            con.setRequestMethod("GET");
-            con.connect();
-            if (HttpURLConnection.HTTP_OK == con.getResponseCode()) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            try {
+                con = (HttpURLConnection) new URL(address).openConnection();
+                con.setRequestMethod("GET");
+                con.connect();
+                if (HttpURLConnection.HTTP_OK == con.getResponseCode()) {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
-                    sb.append("\n");
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        Data dataFromESP = gson.fromJson(line, Data.class);
+                        d.setTemperature(dataFromESP.getTemperature());
+                        d.setHumidity(dataFromESP.getHumidity());
+                        d.setCo2(dataFromESP.getCo2());
+                        d.setLight(1024-dataFromESP.getLight());
+                        d.setDate_time(new Date());
+                        if (d.getMicrocontroller().getLocationID() > 0) {
+                            Location loc = locationService.get(d.getMicrocontroller().getLocationID());
+                            d.getMicrocontroller().setLocation(loc.getName());
+                        }
+                    }
+                } else {
+                    System.out.println("failed: " + con.getResponseCode() + " error " + con.getResponseMessage());
                 }
-            } else {
-                System.out.println("failed: " + con.getResponseCode() + " error " + con.getResponseMessage());
-            }
 
-        } catch (IOException e) {
-            System.out.println(e);
-            return e.toString();
-        } finally {
-            if (con != null) {
-                con.disconnect();
+            } catch (IOException e) {
+                System.out.println(e);
+                return null;
+            } finally {
+                if (con != null) {
+                    con.disconnect();
+                }
             }
         }
-        return sb.toString();
+
+
+        return data;
     }
 
     @GetMapping("/rooms/{id}")
@@ -96,7 +120,7 @@ public class DataController {
         double co2 = ThreadLocalRandom.current().nextDouble(30, 100);
         double light = ThreadLocalRandom.current().nextDouble(100, 4000);
 
-        return new Data(id, title, temp, h, co2, light, new Date());
+        return new Data(id, title, temp, h, co2, light, new Date(), new Microcontroller());
     }
 
     @GetMapping("/{id}")

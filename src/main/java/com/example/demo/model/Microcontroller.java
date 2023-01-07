@@ -8,14 +8,21 @@ import java.util.Set;
 
 @Entity
 public class Microcontroller {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String address;
     @SerializedName("short_name")
     private String shortName;
 
     @SerializedName("location_id")
-    @Nullable
     private int locationID;
+
+    @SerializedName("location_name")
+    @Transient
+    private String locationName;
+
+    public Microcontroller() {}
 
     public String getAddress() {
         return address;
@@ -29,8 +36,7 @@ public class Microcontroller {
         this.id = id;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     public int getId() {
         return id;
     }
@@ -49,5 +55,13 @@ public class Microcontroller {
 
     public void setLocationID(int locationID) {
         this.locationID = locationID;
+    }
+
+    public String getLocation() {
+        return locationName;
+    }
+
+    public void setLocation(String locationName) {
+        this.locationName = locationName;
     }
 }
