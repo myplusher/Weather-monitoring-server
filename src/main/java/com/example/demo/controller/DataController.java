@@ -38,15 +38,12 @@ public class DataController {
     @GetMapping("/")
     public Data[] list() {
         List<Microcontroller> microcontrollers = mcService.listAll();
-        //StringBuilder sb = new StringBuilder();
         Data[] data = new Data[microcontrollers.size()];
         for (int i = 0; i < data.length; i++) {
             data[i] = new Data();
             data[i].setMicrocontroller(mcService.get(microcontrollers.get(i).getId()));
         }
-//        if (microcontrollers.size() > 1) {
-//            sb.append("[");
-//        }
+
         for (Data d: data) {
             String address = d.getMicrocontroller().getAddress();
             address = "http://"+address+":80";
