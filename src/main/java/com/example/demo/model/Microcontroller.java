@@ -1,14 +1,21 @@
 package com.example.demo.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.google.gson.annotations.SerializedName;
+import org.springframework.lang.Nullable;
+
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Microcontroller {
-    private Integer id;
+    private int id;
     private String address;
+    @SerializedName("short_name")
+    private String shortName;
+
+    @SerializedName("location_id")
+    @Nullable
+    private int locationID;
 
     public String getAddress() {
         return address;
@@ -18,13 +25,29 @@ public class Microcontroller {
         this.address = address;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer getId() {
+    public int getId() {
         return id;
+    }
+
+    public String getShortName() {
+        return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public int getLocationID() {
+        return locationID;
+    }
+
+    public void setLocationID(int locationID) {
+        this.locationID = locationID;
     }
 }

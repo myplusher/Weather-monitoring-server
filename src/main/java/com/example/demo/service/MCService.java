@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.model.Location;
 import com.example.demo.model.Microcontroller;
 import com.example.demo.repository.MCRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,8 @@ public class MCService {
     }
 
     public void save(Microcontroller data) {
-        Microcontroller mc = get(data.getId());
-        if (mc.getId() > 0) {
-            mcRepository.update(data.getAddress(), data.getId());
-        } else {
             mcRepository.save(data);
-        }
+
     }
 
     public Microcontroller get(Integer id) {
@@ -34,5 +31,9 @@ public class MCService {
 
     public void delete(Integer id) {
         mcRepository.deleteById(id);
+    }
+
+    public Location findByLocID(int locID) {
+        return mcRepository.findByLocationID(locID);
     }
 }

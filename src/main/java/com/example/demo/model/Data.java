@@ -6,6 +6,8 @@ import java.util.Date;
 @Entity
 @Table(name = "data")
 public class Data {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String title;
     private double temperature;
@@ -13,6 +15,18 @@ public class Data {
     private double co2;
     private double light;
     private Date date_time;
+
+    @ManyToOne
+    @JoinColumn(name = "microcontrollerId", insertable = false, updatable = false)
+    private Microcontroller microcontrollerId;
+
+    public Microcontroller getMicrocontroller() {
+        return microcontrollerId;
+    }
+
+    public void setMicrocontroller(Microcontroller microcontroller) {
+        this.microcontrollerId = microcontroller;
+    }
 
     public Data() {
     }
@@ -26,8 +40,7 @@ public class Data {
         this.light = light;
         this.date_time = date_time;
     }
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     public int getId() {
         return id;
     }

@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Data;
 import com.example.demo.model.Location;
+import com.example.demo.model.Microcontroller;
 import com.example.demo.service.DataService;
+import com.example.demo.service.MCService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class DataController {
     @Autowired
     DataService dataService;
+    
+    @Autowired
+    MCService mcService;
 
     @GetMapping("/")
     public String list() {
+        List<Microcontroller> microcontrollers = mcService.listAll();
+        for (Microcontroller mc: microcontrollers) {
+
+        }
+        
         String address = "http://192.168.0.103:80";
         HttpURLConnection con = null;
         StringBuilder sb = new StringBuilder();
