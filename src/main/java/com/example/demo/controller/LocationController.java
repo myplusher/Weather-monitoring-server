@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/")
 public class LocationController {
@@ -20,8 +22,8 @@ public class LocationController {
     Gson gson = new Gson();
 
     @GetMapping("/locations")
-    public String getLocations() {
-        return gson.toJson(locationService.list());
+    public List<Location> getLocations() {
+        return locationService.list();
     }
 
     @GetMapping("/locations/{id}")

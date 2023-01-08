@@ -33,8 +33,7 @@ public class History {
 
     Gson gson = new Gson();
 
-//    @Scheduled(fixedRate = 900000)
-    @Scheduled(fixedRate = 1000*60)
+    @Scheduled(fixedRate = 1000*60*15)
     public void getDataInterval() {
         List<Microcontroller> microcontrollers = mcService.listAll();
         Data[] data = new Data[microcontrollers.size()];
@@ -58,16 +57,18 @@ public class History {
                     String line;
                     while ((line = br.readLine()) != null) {
                         Data dataFromESP = gson.fromJson(line, Data.class);
-                        d.setTemperature(dataFromESP.getTemperature());
-                        d.setHumidity(dataFromESP.getHumidity());
-                        d.setCo2(dataFromESP.getCo2());
-                        d.setLight(1024-dataFromESP.getLight());
-                        d.setDate_time(new Date());
+                        Data newData = new Data();
+                        newData.setTemperature(dataFromESP.getTemperature());
+                        newData.setHumidity(dataFromESP.getHumidity());
+                        newData.setCo2(dataFromESP.getCo2());
+                        newData.setLight(1024-dataFromESP.getLight());
+                        newData.setDate_time(new Date());
+                        newData.setMicrocontroller(d.getMicrocontroller());
                         if (d.getMicrocontroller().getLocationID() > 0) {
                             Location loc = locationService.get(d.getMicrocontroller().getLocationID());
-                            d.getMicrocontroller().setLocation(loc.getName());
+                            newData.getMicrocontroller().setLocation(loc.getName());
                         }
-                        dataService.saveData(d);
+                        dataService.saveData(newData);
                     }
                 } else {
                     System.out.println("failed: " + con.getResponseCode() + " error " + con.getResponseMessage());

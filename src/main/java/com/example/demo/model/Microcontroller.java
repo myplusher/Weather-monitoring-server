@@ -1,10 +1,8 @@
 package com.example.demo.model;
 
 import com.google.gson.annotations.SerializedName;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 public class Microcontroller {
@@ -12,8 +10,8 @@ public class Microcontroller {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String address;
-    @SerializedName("short_name")
-    private String shortName;
+    @SerializedName("shortname")
+    private String shortname;
 
     @SerializedName("location_id")
     private int locationID;
@@ -41,12 +39,12 @@ public class Microcontroller {
         return id;
     }
 
-    public String getShortName() {
-        return shortName;
+    public String getShortname() {
+        return shortname;
     }
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
+    public void setShortname(String shortName) {
+        this.shortname = shortName;
     }
 
     public int getLocationID() {

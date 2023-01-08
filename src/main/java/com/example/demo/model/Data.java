@@ -20,7 +20,7 @@ public class Data {
 
     @SerializedName("microcontroller")
     @ManyToOne
-    @JoinColumn(name = "microcontrollerId", insertable = false, updatable = false)
+    @JoinColumn(name = "microcontrollerId", insertable = true, updatable = true)
     private Microcontroller microcontrollerId;
 
     public Microcontroller getMicrocontroller() {

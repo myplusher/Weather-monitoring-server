@@ -30,4 +30,8 @@ public class LocationService {
     public void delete(Integer id) {
         locationRepository.deleteById(id);
     }
+
+    public Location getByName(String name) {
+        return locationRepository.findByLocationName(name);
+    }
 }

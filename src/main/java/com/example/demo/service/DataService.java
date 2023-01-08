@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 @Service
@@ -52,6 +53,12 @@ public class DataService {
         try {
             start = new SimpleDateFormat("yyyy-MM-dd").parse(startStr);
             end = new SimpleDateFormat("yyyy-MM-dd").parse(endStr);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(end);
+            cal.add(Calendar.HOUR_OF_DAY, 23);
+            cal.add(Calendar.MINUTE, 59);
+            cal.add(Calendar.SECOND, 59);
+            end = cal.getTime();
         } catch (ParseException e) {
             System.out.println(e);
         }
