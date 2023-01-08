@@ -3,11 +3,13 @@ package com.example.demo.controller;
 import com.example.demo.model.Data;
 import com.example.demo.model.Location;
 import com.example.demo.model.Microcontroller;
+import com.example.demo.repository.DataRepository;
 import com.example.demo.service.DataService;
 import com.example.demo.service.LocationService;
 import com.example.demo.service.MCService;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -34,6 +37,8 @@ public class DataController {
     LocationService locationService;
 
     Gson gson = new Gson();
+    @Autowired
+    private DataRepository dataRepository;
 
     @GetMapping("/")
     public Data[] list() {
@@ -85,6 +90,20 @@ public class DataController {
 
 
         return data;
+    }
+
+    @GetMapping("/history")
+    public List<Data> getHistoryMC(@RequestParam int id,
+                                   @RequestParam(required = false) String start,
+                                   @RequestParam(required = false) String end) {
+        List<Data> dataList = new ArrayList<>();
+        if (start == null || end == null) {
+            dataList = dataService.listByMCID(id);
+        } else {
+            dataList = dataService.listByMCIDTime(id, start, end);
+        }
+
+        return dataList;
     }
 
     @GetMapping("/rooms/{id}")
