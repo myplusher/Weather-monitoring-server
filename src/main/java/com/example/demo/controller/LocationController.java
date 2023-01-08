@@ -50,12 +50,12 @@ public class LocationController {
     }
 
     @GetMapping("/locations/{id}/mc")
-    public String getMCLocation(@PathVariable Integer id) {
+    public Location getMCLocation(@PathVariable Integer id) {
         Location loc = locationService.get(id);
         if (loc.getId() == 0) {
-            return "";
+            return null;
         }
-        return gson.toJson(mcService.findByLocID(id));
+        return mcService.findByLocID(id);
     }
 
 }
