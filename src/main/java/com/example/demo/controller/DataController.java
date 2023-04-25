@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.config.RestConfig;
 import com.example.demo.model.Data;
 import com.example.demo.model.Location;
 import com.example.demo.model.Microcontroller;
@@ -9,10 +10,13 @@ import com.example.demo.service.LocationService;
 import com.example.demo.service.MCService;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,6 +31,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @RestController
 @RequestMapping("/")
 public class DataController {
+
     @Autowired
     DataService dataService;
     
@@ -40,6 +45,9 @@ public class DataController {
     @Autowired
     private DataRepository dataRepository;
 
+    @Autowired
+    RestConfig restConfig;
+
     @GetMapping("/")
     public Data[] list() {
         List<Microcontroller> microcontrollers = mcService.listAll();
@@ -49,43 +57,35 @@ public class DataController {
             data[i].setMicrocontroller(mcService.get(microcontrollers.get(i).getId()));
         }
 
+
+        RestTemplate restTemplate = restConfig.restTemplate();
+
         for (Data d: data) {
             String address = d.getMicrocontroller().getAddress();
             address = "http://"+address+":80";
-            HttpURLConnection con = null;
+
 
             try {
-                con = (HttpURLConnection) new URL(address).openConnection();
-                con.setRequestMethod("GET");
-                con.connect();
-                if (HttpURLConnection.HTTP_OK == con.getResponseCode()) {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        Data dataFromESP = gson.fromJson(line, Data.class);
-                        d.setTemperature(dataFromESP.getTemperature());
-                        d.setHumidity(dataFromESP.getHumidity());
-                        d.setCo2(dataFromESP.getCo2());
-                        d.setLight(1024-dataFromESP.getLight());
-                        d.setDate_time(new Date());
-                        if (d.getMicrocontroller().getLocationID() > 0) {
-                            Location loc = locationService.get(d.getMicrocontroller().getLocationID());
-                            d.getMicrocontroller().setLocation(loc.getName());
-                        }
+                ResponseEntity<String> response = restTemplate.getForEntity(address, String.class);
+                if (!response.getStatusCode().isError()) {
+                    String responseData = response.getBody();
+                    Data dataFromESP = gson.fromJson(responseData, Data.class);
+                    d.setTemperature(dataFromESP.getTemperature());
+                    d.setHumidity(dataFromESP.getHumidity());
+                    d.setCo2(dataFromESP.getCo2());
+                    d.setLight(1024-dataFromESP.getLight());
+                    d.setDate_time(new Date());
+                    if (d.getMicrocontroller().getLocationID() > 0) {
+                        Location loc = locationService.get(d.getMicrocontroller().getLocationID());
+                        d.getMicrocontroller().setLocation(loc.getName());
                     }
                 } else {
-                    System.out.println("failed: " + con.getResponseCode() + " error " + con.getResponseMessage());
+                    System.out.println(response);
                 }
-
-            } catch (IOException e) {
-                System.out.println(e);
-                return null;
-            } finally {
-                if (con != null) {
-                    con.disconnect();
-                }
+            } catch (ResourceAccessException e) {
+                System.out.println(e.toString());
             }
+
         }
 
 
