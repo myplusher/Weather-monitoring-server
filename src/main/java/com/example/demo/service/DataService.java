@@ -58,6 +58,7 @@ public class DataService {
             cal.add(Calendar.HOUR_OF_DAY, 23);
             cal.add(Calendar.MINUTE, 59);
             cal.add(Calendar.SECOND, 59);
+            cal.add(Calendar.DATE, 1);
             end = cal.getTime();
         } catch (ParseException e) {
             System.out.println(e);
