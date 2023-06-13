@@ -4,6 +4,7 @@ import com.example.demo.config.RestConfig;
 import com.example.demo.model.Data;
 import com.example.demo.model.Location;
 import com.example.demo.model.Microcontroller;
+import com.example.demo.model.RoomHistoryDto;
 import com.example.demo.repository.DataRepository;
 import com.example.demo.service.DataService;
 import com.example.demo.service.LocationService;
@@ -93,16 +94,17 @@ public class DataController {
     }
 
     @GetMapping("/history")
-    public List<Data> getHistoryMC(@RequestParam int id,
+    public RoomHistoryDto getHistoryMC(@RequestParam int id,
                                    @RequestParam(required = false) String start,
                                    @RequestParam(required = false) String end) {
-        List<Data> dataList = new ArrayList<>();
+        RoomHistoryDto dataList = new RoomHistoryDto();
         if (start == null || end == null) {
             dataList = dataService.listByMCID(id);
         } else {
             dataList = dataService.listByMCIDTime(id, start, end);
         }
 
+        //TODO починить 500 ошибку
         return dataList;
     }
 
