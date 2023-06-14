@@ -103,8 +103,6 @@ public class DataController {
         } else {
             dataList = dataService.listByMCIDTime(id, start, end);
         }
-
-        //TODO починить 500 ошибку
         return dataList;
     }
 
