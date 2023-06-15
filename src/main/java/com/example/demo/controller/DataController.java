@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -50,12 +51,13 @@ public class DataController {
     RestConfig restConfig;
 
     @GetMapping("/")
-    public Data[] list() {
+    public List<Data> list() {
         List<Microcontroller> microcontrollers = mcService.listAll();
         Data[] data = new Data[microcontrollers.size()];
         for (int i = 0; i < data.length; i++) {
             data[i] = new Data();
             data[i].setMicrocontroller(mcService.get(microcontrollers.get(i).getId()));
+            data[i].setTitle(locationService.get(microcontrollers.get(i).getLocationID()).getName());
         }
 
 
@@ -71,6 +73,7 @@ public class DataController {
                 if (!response.getStatusCode().isError()) {
                     String responseData = response.getBody();
                     Data dataFromESP = gson.fromJson(responseData, Data.class);
+                    d.setId(d.getMicrocontroller().getLocationID());
                     d.setTemperature(dataFromESP.getTemperature());
                     d.setHumidity(dataFromESP.getHumidity());
                     d.setCo2(dataFromESP.getCo2());
@@ -86,11 +89,118 @@ public class DataController {
             } catch (ResourceAccessException e) {
                 System.out.println(e.toString());
             }
-
         }
 
+        List<Data> dataList = new ArrayList<>(Arrays.stream(data).toList());
+        dataList.sort((d1, d2) -> d1.getMicrocontroller().getLocationID() - d2.getMicrocontroller().getLocationID());
 
-        return data;
+        double mint = dataList.get(0).getTemperature();
+        double maxt = dataList.get(0).getTemperature();
+        double avgt = dataList.get(0).getTemperature();
+
+        double minh = dataList.get(0).getHumidity();
+        double maxh = dataList.get(0).getHumidity();
+        double avgh = dataList.get(0).getHumidity();
+
+        double minc = dataList.get(0).getCo2();
+        double maxc = dataList.get(0).getCo2();
+        double avgc = dataList.get(0).getCo2();
+
+        double minl = dataList.get(0).getLight();
+        double maxl = dataList.get(0).getLight();
+        double avgl = dataList.get(0).getLight();
+
+        int counter = 1;
+
+        List<Data> buildData = new ArrayList<>();
+        for (int i = 1; i < dataList.size(); i++) {
+            if (dataList.get(i).getMicrocontroller().getLocationID() == dataList.get(i-1).getMicrocontroller().getLocationID()) {
+                if (dataList.get(i).getTemperature() > maxt) {
+                    maxt = dataList.get(i).getTemperature();
+                }
+                if (dataList.get(i).getTemperature() < mint) {
+                    mint = dataList.get(i).getTemperature();
+                }
+                avgt += dataList.get(i).getTemperature();
+
+
+                if (dataList.get(i).getHumidity() > maxh) {
+                    maxh = dataList.get(i).getHumidity();
+                }
+                if (dataList.get(i).getHumidity() < minh) {
+                    minh = dataList.get(i).getHumidity();
+                }
+                avgh += dataList.get(i).getHumidity();
+
+
+                if (dataList.get(i).getCo2() > maxc) {
+                    maxc = dataList.get(i).getCo2();
+                }
+                if (dataList.get(i).getCo2() < minc) {
+                    minc = dataList.get(i).getCo2();
+                }
+                avgc = dataList.get(i).getCo2();
+
+                if (dataList.get(i).getLight() > maxl) {
+                    maxl = dataList.get(i).getLight();
+                }
+                if (dataList.get(i).getLight() < minl) {
+                    minl = dataList.get(i).getLight();
+                }
+                avgl += dataList.get(i).getLight();
+
+                counter++;
+            } else {
+                Data d = dataList.get(i-1);
+                d.setTemperature(avgt/counter);
+                d.setHumidity(avgh/counter);
+                d.setCo2(avgc/counter);
+                d.setLight(avgl/counter);
+                d.setTemperatureRange(mint + "..." + maxt);
+                d.setHumidityRange(minh + "..." + maxh);
+                d.setCo2Range(minc + "..." + maxc);
+                d.setLightRange(minl + "..." + maxl);
+                buildData.add(d);
+                maxt = dataList.get(i).getTemperature();
+                mint = dataList.get(i).getTemperature();
+                avgt = dataList.get(i).getTemperature();
+                maxh = dataList.get(i).getHumidity();
+                minh = dataList.get(i).getHumidity();
+                avgh = dataList.get(i).getHumidity();
+                maxc = dataList.get(i).getCo2();
+                minc = dataList.get(i).getCo2();
+                avgc = dataList.get(i).getCo2();
+                maxl = dataList.get(i).getLight();
+                minl = dataList.get(i).getLight();
+                avgl = dataList.get(i).getLight();
+                counter = 1;
+            }
+            if (i == dataList.size()-1) {
+                Data d = dataList.get(i);
+                d.setTemperature(avgt/counter);
+                d.setHumidity(avgh/counter);
+                d.setCo2(avgc/counter);
+                d.setLight(avgl/counter);
+                d.setTemperatureRange(mint + "..." + maxt);
+                d.setHumidityRange(minh + "..." + maxh);
+                d.setCo2Range(minc + "..." + maxc);
+                d.setLightRange(minl + "..." + maxl);
+                buildData.add(d);
+                maxt = 0;
+                mint = 0;
+                avgt = 0;
+                maxh = 0;
+                minh = 0;
+                avgh = 0;
+                maxc = 0;
+                minc = 0;
+                avgc = 0;
+                maxl = 0;
+                minl = 0;
+                avgl = 0;
+            }
+        }
+        return buildData;
     }
 
     @GetMapping("/history")

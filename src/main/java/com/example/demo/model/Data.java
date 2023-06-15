@@ -11,12 +11,21 @@ public class Data {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private String title;
+    private String title; // Класть название помещения
     private double temperature;
     private double humidity;
     private double co2;
     private double light;
     private Date date_time;
+
+    @Transient
+    private String temperatureRange;
+    @Transient
+    private String humidityRange;
+    @Transient
+    private String co2Range;
+    @Transient
+    private String lightRange;
 
     @SerializedName("microcontroller")
     @ManyToOne
@@ -100,5 +109,37 @@ public class Data {
 
     public void setDate_time(Date date_time) {
         this.date_time = date_time;
+    }
+
+    public String getTemperatureRange() {
+        return temperatureRange;
+    }
+
+    public void setTemperatureRange(String temperatureRange) {
+        this.temperatureRange = temperatureRange;
+    }
+
+    public String getHumidityRange() {
+        return humidityRange;
+    }
+
+    public void setHumidityRange(String humidityRange) {
+        this.humidityRange = humidityRange;
+    }
+
+    public String getCo2Range() {
+        return co2Range;
+    }
+
+    public void setCo2Range(String co2Range) {
+        this.co2Range = co2Range;
+    }
+
+    public String getLightRange() {
+        return lightRange;
+    }
+
+    public void setLightRange(String lightRange) {
+        this.lightRange = lightRange;
     }
 }

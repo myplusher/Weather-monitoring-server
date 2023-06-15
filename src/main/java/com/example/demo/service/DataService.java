@@ -13,10 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+
 @Service
 @Transactional
 public class DataService {
@@ -145,5 +143,12 @@ public class DataService {
         }
 
         return htmlString.toString();
+    }
+
+    public void sortDataByLocation(List<Data> dataList) {
+        Collections.sort(dataList, (d1, d2) -> d1.getMicrocontroller().getLocationID() - d2.getMicrocontroller().getLocationID());
+
+//        dataList.sort(Comparator.comparingDouble(
+//                data -> data.getMicrocontroller().getLocationID()));
     }
 }
